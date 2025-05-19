@@ -71,7 +71,7 @@ class TaskManager {
     public void deleteAllSubtasks() {
         subtasks.clear();
         for (Epic epic : epics.values()) {
-            epic.getSubtaskIds().clear();
+            epic.clearSubtaskIds();
             updateEpicStatus(epic);
         }
     }
@@ -87,14 +87,12 @@ class TaskManager {
 
     public void updateEpic(Epic epic) {
         int id = epic.getId();
-        if (!epics.containsKey(id)) {
+        Epic oldEpic = epics.get(id);
+        if (oldEpic == null) {
             throw new IllegalArgumentException("Эпик с id " + id + " не найден");
         }
-        Epic oldEpic = epics.get(id);
-        epic.setStatus(oldEpic.getStatus());
-        epic.getSubtaskIds().clear();
-        epic.getSubtaskIds().addAll(oldEpic.getSubtaskIds());
-        epics.put(id, epic);
+        oldEpic.setTitle(epic.getTitle());
+        oldEpic.setDescription(epic.getDescription());
     }
 
     public void updateSubtask(Subtask subtask) {
@@ -102,24 +100,16 @@ class TaskManager {
         if (!subtasks.containsKey(id)) {
             throw new IllegalArgumentException("Подзадача с id " + id + " не найдена");
         }
-        int oldEpicId = subtasks.get(id).getEpicId();
-        int newEpicId = subtask.getEpicId();
 
-        if (oldEpicId != newEpicId) {
-            Epic oldEpic = epics.get(oldEpicId);
-            Epic newEpic = epics.get(newEpicId);
-            if (newEpic == null) {
-                throw new IllegalArgumentException("Новый эпик с id " + newEpicId + " не найден");
-            }
-            oldEpic.removeSubtaskId(id);
-            updateEpicStatus(oldEpic);
+        Subtask existingSubtask = subtasks.get(id);
+        if (subtask.getEpicId() != existingSubtask.getEpicId()) {
+            throw new IllegalArgumentException("Нельзя изменить epicId подзадачи");
+        }
 
-            newEpic.addSubtaskId(id);
-            subtasks.put(id, subtask);
-            updateEpicStatus(newEpic);
-        } else {
-            subtasks.put(id, subtask);
-            updateEpicStatus(epics.get(newEpicId));
+        subtasks.put(id, subtask);
+        Epic epic = epics.get(subtask.getEpicId());
+        if (epic != null) {
+            updateEpicStatus(epic);
         }
     }
 
@@ -136,7 +126,7 @@ class TaskManager {
         if (epic == null) {
             throw new IllegalArgumentException("Эпик с id " + id + " не найден");
         }
-        for (int subtaskId : new ArrayList<>(epic.getSubtaskIds())) {
+        for (int subtaskId : epic.getSubtaskIds()) {
             subtasks.remove(subtaskId);
         }
         epics.remove(id);
