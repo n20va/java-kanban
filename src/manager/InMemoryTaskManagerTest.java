@@ -74,13 +74,10 @@ public class InMemoryTaskManagerTest {
         Subtask subtask = new Subtask("Subtask 1", "Description subtask 1", Status.NEW, epic.getId());
         manager.addSubtask(subtask);
 
-        // Удаляем эпик
         manager.removeEpicById(epic.getId());
 
-        // Эпик удален
         assertTrue(manager.getAllEpics().isEmpty());
 
-        // Сабтаски тоже удалены
         assertTrue(manager.getAllSubtasks().isEmpty());
     }
 

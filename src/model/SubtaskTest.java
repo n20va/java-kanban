@@ -13,4 +13,5 @@ public class SubtaskTest {
         assertEquals(Status.NEW, subtask.getStatus());
         assertEquals(1, subtask.getEpicId());
     }
+
 }

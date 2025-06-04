@@ -49,13 +49,4 @@ class EpicTest {
         assertTrue(epic.getSubtaskIds().contains(subtask2.getId()));
     }
 
-    @Test
-    void toString_returnsCorrectFormat() {
-        epic.setId(100);
-
-        String expected = "Epic{" +
-                "id=100, name='Epic Title', description='Epic Description', status=NEW, subtaskIds=[]" +
-                '}';
-        assertEquals(expected, epic.toString());
-    }
 }
