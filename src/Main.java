@@ -12,13 +12,11 @@ public class Main {
     public static void main(String[] args) {
         TaskManager taskManager = Managers.getDefault();
 
-        // Создаем задачи
         Task task1 = new Task("Покупки", "Купить продукты", Status.NEW);
         Task task2 = new Task("Тренировка", "Сходить в зал", Status.IN_PROGRESS);
         taskManager.addTask(task1);
         taskManager.addTask(task2);
 
-        // Создаем эпик с подзадачами
         Epic epic1 = new Epic("Проект", "Разработка нового функционала");
         taskManager.addEpic(epic1);
 
@@ -27,7 +25,6 @@ public class Main {
         taskManager.addSubtask(subtask1);
         taskManager.addSubtask(subtask2);
 
-        // Просматриваем задачи для наполнения истории
         System.out.println("\n=== Просмотр задач ===");
         taskManager.getTaskById(task1.getId());
         taskManager.getEpicById(epic1.getId());
@@ -35,18 +32,15 @@ public class Main {
         taskManager.getSubtaskById(subtask2.getId());
         taskManager.getTaskById(task2.getId());
 
-        // Выводим все задачи и историю
         printAllTasks(taskManager);
 
-        // Создаем больше задач для демонстрации ограничения истории
         System.out.println("\n=== Создаем дополнительные задачи ===");
         for (int i = 3; i <= 12; i++) {
             Task task = new Task("Задача " + i, "Описание " + i, Status.NEW);
             taskManager.addTask(task);
-            taskManager.getTaskById(task.getId()); // Просматриваем задачу
+            taskManager.getTaskById(task.getId()); 
         }
 
-        // Выводим историю после превышения лимита (10 элементов)
         System.out.println("\n=== История после 12 просмотров ===");
         printHistory(taskManager);
     }
