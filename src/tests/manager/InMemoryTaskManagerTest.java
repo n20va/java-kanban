@@ -1,5 +1,6 @@
-package manager;
+package tests.manager;
 
+import manager.InMemoryTaskManager;
 import model.Epic;
 import model.Status;
 import model.Subtask;
@@ -52,7 +53,6 @@ public class InMemoryTaskManagerTest {
         assertEquals(1, subtasks.size());
         assertEquals(subtask.getTitle(), subtasks.get(0).getTitle());
 
-        // Проверяем, что сабтаск добавлен в эпик
         Epic updatedEpic = manager.getEpicById(epic.getId());
         assertTrue(updatedEpic.getSubtaskIds().contains(subtask.getId()));
     }

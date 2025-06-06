@@ -90,20 +90,35 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateEpic(Epic epic) {
-        if (epics.containsKey(epic.getId())) {
-            epics.put(epic.getId(), epic);
+        int id = epic.getId();
+        Epic oldEpic = epics.get(id);
+        if (oldEpic == null) {
+            throw new IllegalArgumentException("Эпик с id " + id + " не найден");
+        }
+        oldEpic.setTitle(epic.getTitle());
+        oldEpic.setDescription(epic.getDescription());
+    }
+
+
+    @Override
+    public void updateSubtask(Subtask subtask) {
+        int id = subtask.getId();
+        if (!subtasks.containsKey(id)) {
+            throw new IllegalArgumentException("Подзадача с id " + id + " не найдена");
+        }
+
+        Subtask existingSubtask = subtasks.get(id);
+        if (subtask.getEpicId() != existingSubtask.getEpicId()) {
+            throw new IllegalArgumentException("Нельзя изменить epicId подзадачи");
+        }
+
+        subtasks.put(id, subtask);
+        Epic epic = epics.get(subtask.getEpicId());
+        if (epic != null) {
             updateEpicStatus(epic.getId());
         }
     }
 
-    @Override
-    public void updateSubtask(Subtask subtask) {
-        int subtaskId = subtask.getId();
-        if (subtasks.containsKey(subtaskId)) {
-            subtasks.put(subtaskId, subtask);
-            updateEpicStatus(subtask.getEpicId());
-        }
-    }
 
     @Override
     public void removeTaskById(int id) {
