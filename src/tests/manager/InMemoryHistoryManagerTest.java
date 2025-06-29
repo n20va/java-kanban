@@ -36,7 +36,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void shouldRemoveDuplicates() {
+    void addSameTaskTwice() {
         Task task = new Task("Task", "Desc", Status.NEW);
         task.setId(1);
 
@@ -44,23 +44,22 @@ class InMemoryHistoryManagerTest {
         historyManager.add(task);
 
         List<Task> history = historyManager.getHistory();
-        assertEquals(1, history.size());
+        assertEquals(2, history.size());
+        assertEquals(task, history.get(0));
+        assertEquals(task, history.get(1));
     }
 
     @Test
-    void shouldRemoveNodeFromMiddle() {
-        Task task1 = new Task("Task1", "Desc", Status.NEW);
-        Task task2 = new Task("Task2", "Desc", Status.NEW);
-        Task task3 = new Task("Task3", "Desc", Status.NEW);
-        task1.setId(1); task2.setId(2); task3.setId(3);
-
-        historyManager.add(task1);
-        historyManager.add(task2);
-        historyManager.add(task3);
-        historyManager.add(task2); 
+    void historyLimit() {
+        for (int i = 1; i <= 15; i++) {
+            Task task = new Task("Task" + i, "Desc", Status.NEW);
+            task.setId(i);
+            historyManager.add(task);
+        }
 
         List<Task> history = historyManager.getHistory();
-        assertEquals(3, history.size());
-        assertEquals(List.of(task1, task3, task2), history);
+        assertEquals(10, history.size());
+        assertEquals(6, history.get(0).getId());
+        assertEquals(15, history.get(9).getId());
     }
 }
