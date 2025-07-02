@@ -26,14 +26,11 @@ public class Main {
         manager.addSubtask(subtask1);
         manager.addSubtask(subtask2);
 
-        // Просмотры для теста истории
         manager.getTaskById(task1.getId());
         manager.getEpicById(epic1.getId());
         manager.getSubtaskById(subtask1.getId());
 
         printAll(manager);
-
-        // Восстановление менеджера из файла
         System.out.println("\nВосстановление менеджера из файла:");
         TaskManager restoredManager = FileBackedTaskManager.loadFromFile(file);
         printAll(restoredManager);
