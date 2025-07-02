@@ -23,6 +23,7 @@ public class Main {
 
         Subtask subtask1 = new Subtask("Бронирование зала", "Выбрать и забронировать помещение", Status.NEW, epic1.getId());
         Subtask subtask2 = new Subtask("Закупка еды", "Заказать еду и напитки", Status.NEW, epic1.getId());
+
         manager.addSubtask(subtask1);
         manager.addSubtask(subtask2);
 
@@ -55,6 +56,7 @@ public class Main {
         System.out.println("\n=== История просмотров ===");
         for (Task task : manager.getHistory()) {
             System.out.println(task);
+
         }
     }
 }

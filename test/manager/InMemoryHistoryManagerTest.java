@@ -1,3 +1,4 @@
+
 package test.manager;
 
 import manager.HistoryManager;
@@ -63,4 +64,5 @@ class InMemoryHistoryManagerTest {
         assertEquals(3, history.size());
         assertEquals(List.of(task1, task3, task2), history);
     }
+
 }
