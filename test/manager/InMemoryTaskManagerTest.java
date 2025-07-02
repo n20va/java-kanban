@@ -1,4 +1,4 @@
-package tests.manager;
+package test.manager;
 
 import manager.InMemoryTaskManager;
 import model.Epic;
