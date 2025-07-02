@@ -51,6 +51,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
+    public void clearTasks() {
+        super.clearTasks();
+        save();
+    }
+
+    @Override
     public void addEpic(Epic epic) {
         super.addEpic(epic);
         save();
@@ -69,6 +75,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
+    public void clearEpics() {
+        super.clearEpics();
+        save();
+    }
+
+    @Override
     public void addSubtask(Subtask subtask) {
         super.addSubtask(subtask);
         save();
@@ -83,6 +95,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public void removeSubtaskById(int id) {
         super.removeSubtaskById(id);
+        save();
+    }
+
+    @Override
+    public void clearSubtasks() {
+        super.clearSubtasks();
         save();
     }
 
@@ -118,6 +136,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             case "EPIC":
                 Epic epic = new Epic(title, description);
                 epic.setId(id);
+                epic.setStatus(Status.NEW);
                 return epic;
             case "SUBTASK":
                 int epicId = Integer.parseInt(parts[5]);
@@ -131,6 +150,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
+
         try {
             List<String> lines = Files.readAllLines(file.toPath());
             for (int i = 1; i < lines.size(); i++) { // пропускаем заголовок
@@ -144,6 +164,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
                 if (task.getId() >= manager.nextId) {
                     manager.nextId = task.getId() + 1;
+                }
+            }
+            for (Subtask subtask : manager.subtasks.values()) {
+                Epic epic = manager.epics.get(subtask.getEpicId());
+                if (epic != null) {
+                    epic.addSubtask(subtask);
                 }
             }
         } catch (IOException e) {
