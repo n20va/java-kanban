@@ -68,11 +68,6 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{"
-                + "id=" + id
-                + ", title='" + title + '\''
-                + ", description='" + description + '\''
-                + ", status=" + status
-                + '}';
+        return String.format("%d,TASK,%s,%s,%s,", id, title, status, description);
     }
 }
