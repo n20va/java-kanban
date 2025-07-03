@@ -92,4 +92,5 @@ public class InMemoryTaskManagerTest {
         Task updated = manager.getTaskById(task.getId());
         assertEquals(Status.DONE, updated.getStatus());
     }
+
 }
