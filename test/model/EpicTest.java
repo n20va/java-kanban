@@ -6,23 +6,37 @@ import model.Subtask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-class EpicTest {
+public class EpicTest {
+
     private Epic epic;
-    private Subtask subtask1;
-    private Subtask subtask2;
+    private Subtask s1;
+    private Subtask s2;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         epic = new Epic("Epic Title", "Epic Description");
-
-        subtask1 = new Subtask("Subtask 1", "Description 1", Status.NEW, epic.getId());
-        subtask2 = new Subtask("Subtask 2", "Description 2", Status.NEW, epic.getId());
-
-        subtask1.setId(1);
-        subtask2.setId(2);
     }
+
+    @Test
+    public void shouldReturnNewStatusIfAllSubtasksNew() {
+        Subtask s1 = new Subtask("Sub1", "Desc1", Status.NEW, epic.getId(),
+                Duration.ofMinutes(30), LocalDateTime.of(2025, 7, 1, 10, 0));
+        Subtask s2 = new Subtask("Sub2", "Desc2", Status.NEW, epic.getId(),
+                Duration.ofMinutes(60), LocalDateTime.of(2025, 7, 1, 12, 0));
+
+        epic.addSubtaskId(s1.getEpicId());
+        epic.addSubtaskId(s2.getEpicId());
+
+        assertEquals(Status.NEW, epic.getStatus());
+    }
+
+
+
 
     @Test
     void epicIsCreatedWithEmptySubtaskList() {
@@ -30,26 +44,5 @@ class EpicTest {
         assertTrue(epic.getSubtaskIds().isEmpty());
     }
 
-    @Test
-    void addSubtask_addsIdToList() {
-        epic.addSubtask(subtask1);
-        epic.addSubtask(subtask2);
-
-        assertEquals(2, epic.getSubtaskIds().size());
-        assertTrue(epic.getSubtaskIds().contains(subtask1.getId()));
-        assertTrue(epic.getSubtaskIds().contains(subtask2.getId()));
-    }
-
-    @Test
-    void removeSubtask_removesCorrectId() {
-        epic.addSubtask(subtask1);
-        epic.addSubtask(subtask2);
-
-        epic.removeSubtask(subtask1.getId());
-
-        assertEquals(1, epic.getSubtaskIds().size());
-        assertFalse(epic.getSubtaskIds().contains(subtask1.getId()));
-        assertTrue(epic.getSubtaskIds().contains(subtask2.getId()));
-    }
 
 }

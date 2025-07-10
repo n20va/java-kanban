@@ -24,7 +24,8 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void add(Task task) {
         if (task == null) return;
         int id = task.getId();
-        remove(id); // Удаляем предыдущий просмотр
+        remove(id);
+
         linkLast(task);
     }
 

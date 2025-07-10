@@ -1,54 +1,53 @@
-import manager.InMemoryTaskManager;
-import manager.Managers;
+import manager.FileBackedTaskManager;
 import manager.TaskManager;
-import model.Epic;
-import model.Status;
-import model.Subtask;
-import model.Task;
+import model.*;
 
-import java.util.List;
+import java.io.File;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class Main {
     public static void main(String[] args) {
-        TaskManager manager = Managers.getDefault();
-        Task task1 = new Task("Task1", "Desc", Status.NEW);
-        Task task2 = new Task("Task2", "Desc", Status.NEW);
+        File file = new File("tasks.csv");
+        TaskManager manager = new FileBackedTaskManager(file);
+
+        Task task1 = new Task("Task 1", "Simple task",
+                Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2025, 7, 1, 10, 0));
+        Task task2 = new Task("Task 2", "Another task",
+                Status.NEW, Duration.ofMinutes(45), LocalDateTime.of(2025, 7, 1, 11, 0));
         manager.addTask(task1);
         manager.addTask(task2);
 
-        Epic epic1 = new Epic("Epic1", "Desc");
-        Epic epic2 = new Epic("Epic2", "Desc");
-        manager.addEpic(epic1);
-        manager.addEpic(epic2);
+        Epic epic = new Epic("Epic 1", "Epic with subtasks");
+        manager.addEpic(epic);
 
-        Subtask subtask1 = new Subtask("Sub1", "Desc", Status.NEW, epic1.getId());
-        Subtask subtask2 = new Subtask("Sub2", "Desc", Status.NEW, epic1.getId());
+        Subtask subtask1 = new Subtask("Subtask 1", "Part 1",
+                Status.NEW, epic.getId(), Duration.ofMinutes(60), LocalDateTime.of(2025, 7, 1, 9, 0));
+        Subtask subtask2 = new Subtask("Subtask 2", "Part 2",
+                Status.DONE, epic.getId(), Duration.ofMinutes(90), LocalDateTime.of(2025, 7, 1, 13, 0));
         manager.addSubtask(subtask1);
         manager.addSubtask(subtask2);
 
-        manager.getTaskById(task1.getId());
-        manager.getEpicById(epic1.getId());
-        manager.getTaskById(task1.getId());
-        manager.getSubtaskById(subtask1.getId());
-        printHistory(manager);
+        System.out.println("=== Prioritized Tasks ===");
+        for (Task task : manager.getPrioritizedTasks()) {
+            System.out.println(task + " | start=" + task.getStartTime() + " | end=" + task.getEndTime());
+        }
 
-        manager.removeTaskById(task1.getId());
-        printHistory(manager);
+        TaskManager loadedManager = FileBackedTaskManager.loadFromFile(file);
+        System.out.println("\n=== Loaded Tasks ===");
+        for (Task task : loadedManager.getAllTasks()) {
+            System.out.println(task);
+        }
 
-        manager.removeEpicById(epic1.getId());
-        printHistory(manager); // []
-    }
+        System.out.println("\n=== Loaded Epics ===");
+        for (Epic e : loadedManager.getAllEpics()) {
+            System.out.println(e);
+        }
 
-    private static void printHistory(TaskManager manager) {
-        List<Task> history = manager.getHistory();
-        if (history.isEmpty()) {
-            System.out.println("History is empty");
-        } else {
-            System.out.println("\nView history (" + history.size() + " items):");
-            for (int i = 0; i < history.size(); i++) {
-                Task task = history.get(i);
-                System.out.println((i + 1) + ". " + task.getTitle() + " [ID:" + task.getId() + "]");
-            }
+        System.out.println("\n=== Loaded Subtasks ===");
+        for (Subtask s : loadedManager.getAllSubtasks()) {
+            System.out.println(s);
+
         }
     }
 }
