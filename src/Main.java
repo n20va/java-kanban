@@ -48,6 +48,7 @@ public class Main {
         System.out.println("\n=== Loaded Subtasks ===");
         for (Subtask s : loadedManager.getAllSubtasks()) {
             System.out.println(s);
+
         }
     }
 }

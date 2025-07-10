@@ -119,6 +119,8 @@ public class InMemoryTaskManager implements TaskManager {
         epics.put(epic.getId(), epic);
         updateEpicTimeAndDuration(epic);
     }
+
+
     @Override
     public void updateSubtask(Subtask subtask) {
         if (subtask == null || !subtasks.containsKey(subtask.getId())) return;
@@ -136,11 +138,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeTaskById(int id) {
+
         Task task = tasks.remove(id);
         if (task != null) {
             prioritizedTasks.remove(task);
             removeFromHistory(task);
         }
+
     }
 
     @Override
@@ -148,6 +152,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.remove(id);
         if (epic != null) {
             for (int subId : epic.getSubtaskIds()) {
+
                 Subtask subtask = subtasks.remove(subId);
                 if (subtask != null) {
                     prioritizedTasks.remove(subtask);
@@ -155,6 +160,7 @@ public class InMemoryTaskManager implements TaskManager {
                 }
             }
             removeFromHistory(epic);
+
         }
     }
 
@@ -170,6 +176,7 @@ public class InMemoryTaskManager implements TaskManager {
                 updateEpicTimeAndDuration(epic);
             }
             removeFromHistory(subtask);
+
         }
     }
 
@@ -177,12 +184,14 @@ public class InMemoryTaskManager implements TaskManager {
     public void clearTasks() {
         for (Task task : tasks.values()) {
             prioritizedTasks.remove(task);
+
         }
         tasks.clear();
     }
 
     @Override
     public void clearEpics() {
+
         for (Epic epic : epics.values()) {
             for (int subId : epic.getSubtaskIds()) {
                 Subtask subtask = subtasks.remove(subId);
@@ -191,14 +200,17 @@ public class InMemoryTaskManager implements TaskManager {
                 }
             }
             removeFromHistory(epic);
+
         }
         epics.clear();
     }
 
     @Override
     public void clearSubtasks() {
+
         for (Subtask subtask : subtasks.values()) {
             prioritizedTasks.remove(subtask);
+
         }
         subtasks.clear();
         for (Epic epic : epics.values()) {

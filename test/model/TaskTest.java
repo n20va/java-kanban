@@ -70,5 +70,6 @@ public class TaskTest {
         assertTrue(str.contains(String.valueOf(task.getDuration().toMinutes())));
 
         assertTrue(str.contains(task.getStartTime().toString()));
+
     }
 }

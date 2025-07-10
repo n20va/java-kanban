@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,6 +26,7 @@ public class InMemoryTaskManagerTest {
     @Test
     public void testAddAndGetTask() {
         Task task = new Task("Task 1", "Description task 1", Status.NEW, Duration.ZERO, null);
+
         manager.addTask(task);
 
         List<Task> tasks = manager.getAllTasks();
@@ -48,6 +50,7 @@ public class InMemoryTaskManagerTest {
         manager.addEpic(epic);
 
         Subtask subtask = new Subtask("Subtask 1", "Description subtask 1", Status.NEW, epic.getId(), Duration.ZERO, null);
+
         manager.addSubtask(subtask);
 
         List<Subtask> subtasks = manager.getAllSubtasks();
@@ -61,6 +64,7 @@ public class InMemoryTaskManagerTest {
     @Test
     public void testRemoveTask() {
         Task task = new Task("Task 1", "Description task 1", Status.NEW, Duration.ZERO, null);
+
         manager.addTask(task);
 
         manager.removeTaskById(task.getId());
@@ -73,6 +77,7 @@ public class InMemoryTaskManagerTest {
         manager.addEpic(epic);
 
         Subtask subtask = new Subtask("Subtask 1", "Description subtask 1", Status.NEW, epic.getId(), Duration.ZERO, null);
+
         manager.addSubtask(subtask);
 
         manager.removeEpicById(epic.getId());
@@ -85,6 +90,7 @@ public class InMemoryTaskManagerTest {
     @Test
     public void testUpdateTask() {
         Task task = new Task("Task 1", "Description task 1", Status.NEW, Duration.ZERO, null);
+
         manager.addTask(task);
 
         task.setStatus(Status.DONE);

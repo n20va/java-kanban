@@ -1,19 +1,24 @@
 package test.manager;
 
+
 import manager.InMemoryHistoryManager;
 import model.Task;
 import model.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+
 import java.time.Duration;
 import java.time.LocalDateTime;
+
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
+
     private InMemoryHistoryManager historyManager;
+
 
     @BeforeEach
     void setUp() {
@@ -58,3 +63,4 @@ class InMemoryHistoryManagerTest {
         assertEquals(task2, history.get(0));
     }
 }
+
