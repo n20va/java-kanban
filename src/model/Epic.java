@@ -1,41 +1,45 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class Epic extends Task {
-    private final List<Integer> subtaskIds = new ArrayList<>();
+    private List<Integer> subtaskIds = new ArrayList<>();
 
     public Epic(String title, String description) {
-        super(title, description, Status.NEW);
+        super(title, description, Status.NEW, Duration.ZERO, null);
     }
+
 
     public List<Integer> getSubtaskIds() {
         return subtaskIds;
     }
 
-    public void addSubtask(Subtask subtask) {
-        subtaskIds.add(subtask.getId());
+    public void addSubtaskId(int id) {
+        subtaskIds.add(id);
     }
 
-    public void removeSubtask(int subtaskId) {
-        subtaskIds.remove((Integer) subtaskId);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Epic)) return false;
-        if (!super.equals(o)) return false;
-        Epic epic = (Epic) o;
-        return Objects.equals(subtaskIds, epic.subtaskIds);
+    public void removeSubtaskId(int id) {
+        subtaskIds.remove(Integer.valueOf(id));
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), subtaskIds);
+    public Duration getDuration() {
+        return super.getDuration();
     }
+
+    @Override
+    public LocalDateTime getStartTime() {
+        return super.getStartTime();
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return super.getEndTime();
+    }
+
     @Override
     public String toString() {
         return "Epic{" +
@@ -43,7 +47,11 @@ public class Epic extends Task {
                 ", title='" + getTitle() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", status=" + getStatus() +
+                ", duration=" + (getDuration() != null ? getDuration().toMinutes() : "null") +
+                ", startTime=" + getStartTime() +
                 ", subtaskIds=" + subtaskIds +
                 '}';
     }
+
+
 }
