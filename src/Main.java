@@ -12,9 +12,9 @@ public class Main {
         TaskManager manager = new FileBackedTaskManager(file);
 
         Task task1 = new Task("Task 1", "Simple task",
-                Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2025, 7, 1, 10, 0));
+                Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2025, 7, 1, 8, 0)); 
         Task task2 = new Task("Task 2", "Another task",
-                Status.NEW, Duration.ofMinutes(45), LocalDateTime.of(2025, 7, 1, 11, 0));
+                Status.NEW, Duration.ofMinutes(45), LocalDateTime.of(2025, 7, 1, 8, 45)); 
         manager.addTask(task1);
         manager.addTask(task2);
 
@@ -22,9 +22,9 @@ public class Main {
         manager.addEpic(epic);
 
         Subtask subtask1 = new Subtask("Subtask 1", "Part 1",
-                Status.NEW, epic.getId(), Duration.ofMinutes(60), LocalDateTime.of(2025, 7, 1, 9, 0));
+                Status.NEW, epic.getId(), Duration.ofMinutes(60), LocalDateTime.of(2025, 7, 1, 10, 0));
         Subtask subtask2 = new Subtask("Subtask 2", "Part 2",
-                Status.DONE, epic.getId(), Duration.ofMinutes(90), LocalDateTime.of(2025, 7, 1, 13, 0));
+                Status.DONE, epic.getId(), Duration.ofMinutes(90), LocalDateTime.of(2025, 7, 1, 11, 30)); 
         manager.addSubtask(subtask1);
         manager.addSubtask(subtask2);
 
@@ -47,7 +47,6 @@ public class Main {
         System.out.println("\n=== Loaded Subtasks ===");
         for (Subtask s : loadedManager.getAllSubtasks()) {
             System.out.println(s);
-
         }
     }
 }
