@@ -105,10 +105,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void addTask(Task task) {
-        task.setId(generateId());
         if (checkTimeIntersection(task)) {
             throw new IllegalArgumentException("Task time overlaps with another task");
         }
+        task.setId(generateId());
         tasks.put(task.getId(), task);
         prioritizedTasks.add(task);
     }
@@ -124,10 +124,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (!epics.containsKey(subtask.getEpicId())) {
             throw new IllegalArgumentException("Epic not found");
         }
-        subtask.setId(generateId());
         if (checkTimeIntersection(subtask)) {
             throw new IllegalArgumentException("Subtask time overlaps with another task");
         }
+        subtask.setId(generateId());
         subtasks.put(subtask.getId(), subtask);
         prioritizedTasks.add(subtask);
         Epic epic = epics.get(subtask.getEpicId());
@@ -149,10 +149,16 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubtask(Subtask subtask) {
         if (!subtasks.containsKey(subtask.getId())) return;
+        Subtask existingSubtask = subtasks.get(subtask.getId());
+        if (existingSubtask.getEpicId() != subtask.getEpicId()) {
+            throw new IllegalArgumentException("Cannot change epicId of subtask");
+        }
+
         if (checkTimeIntersection(subtask)) {
             throw new IllegalArgumentException("Subtask time overlaps with another task");
         }
-        prioritizedTasks.remove(subtasks.get(subtask.getId()));
+
+        prioritizedTasks.remove(existingSubtask);
         subtasks.put(subtask.getId(), subtask);
         prioritizedTasks.add(subtask);
         updateEpicFields(epics.get(subtask.getEpicId()));
