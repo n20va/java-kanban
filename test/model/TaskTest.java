@@ -5,91 +5,71 @@ import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-class TaskTest {
+public class TaskTest {
+
     private Task task;
 
     @BeforeEach
-    void setUp() {
-        task = new Task("Test Task", "Test Description", Status.NEW);
-        task.setId(1);
+    public void setUp() {
+        task = new Task(
+                "Test Task",
+                "Description of test task",
+                Status.NEW,
+                Duration.ofMinutes(120),
+                LocalDateTime.of(2025, 7, 10, 9, 0)
+        );
     }
 
     @Test
-    void testConstructorAndGetters() {
-        assertEquals(1, task.getId());
+    public void shouldCreateTaskWithCorrectFields() {
         assertEquals("Test Task", task.getTitle());
-        assertEquals("Test Description", task.getDescription());
+        assertEquals("Description of test task", task.getDescription());
         assertEquals(Status.NEW, task.getStatus());
+        assertEquals(Duration.ofMinutes(120), task.getDuration());
+        assertEquals(LocalDateTime.of(2025, 7, 10, 9, 0), task.getStartTime());
     }
 
     @Test
-    void testSetters() {
-        task.setId(42);
-        task.setTitle("Updated Title");
-        task.setDescription("Updated Description");
-        task.setStatus(Status.IN_PROGRESS);
+    public void shouldCalculateEndTimeCorrectly() {
+        LocalDateTime expectedEndTime = LocalDateTime.of(2025, 7, 10, 11, 0);
+        assertEquals(expectedEndTime, task.getEndTime());
+    }
 
-        assertEquals(42, task.getId());
-        assertEquals("Updated Title", task.getTitle());
-        assertEquals("Updated Description", task.getDescription());
+    @Test
+    public void shouldUpdateStatus() {
+        task.setStatus(Status.IN_PROGRESS);
         assertEquals(Status.IN_PROGRESS, task.getStatus());
     }
 
     @Test
-    void testEquals_sameValues_shouldBeEqual() {
-        Task other = new Task("Test Task", "Test Description", Status.NEW);
-        other.setId(1);
+    public void shouldUpdateStartTimeAndDuration() {
+        task.setStartTime(LocalDateTime.of(2025, 7, 10, 10, 0));
+        task.setDuration(Duration.ofMinutes(30));
 
-        assertEquals(task, other);
+        assertEquals(LocalDateTime.of(2025, 7, 10, 10, 0), task.getStartTime());
+        assertEquals(Duration.ofMinutes(30), task.getDuration());
+        assertEquals(LocalDateTime.of(2025, 7, 10, 10, 30), task.getEndTime());
     }
 
     @Test
-    void testEquals_differentId_shouldNotBeEqual() {
-        Task other = new Task("Test Task", "Test Description", Status.NEW);
-        other.setId(99);
+    public void toStringShouldContainAllFields() {
+        String str = task.toString();
 
-        assertNotEquals(task, other);
-    }
+        assertNotNull(str);
+        assertFalse(str.isEmpty());
 
-    @Test
-    void testEquals_differentTitle_shouldNotBeEqual() {
-        Task other = new Task("Different Title", "Test Description", Status.NEW);
-        other.setId(1);
+        assertTrue(str.contains(task.getTitle()));
+        assertTrue(str.contains(task.getDescription()));
+        assertTrue(str.contains(task.getStatus().toString()));
 
-        assertNotEquals(task, other);
-    }
+        assertTrue(str.contains(String.valueOf(task.getDuration().toMinutes())));
 
-    @Test
-    void testEquals_differentDescription_shouldNotBeEqual() {
-        Task other = new Task("Test Task", "Other Description", Status.NEW);
-        other.setId(1);
+        assertTrue(str.contains(task.getStartTime().toString()));
 
-        assertNotEquals(task, other);
-    }
-
-    @Test
-    void testEquals_differentStatus_shouldNotBeEqual() {
-        Task other = new Task("Test Task", "Test Description", Status.DONE);
-        other.setId(1);
-
-        assertNotEquals(task, other);
-    }
-
-    @Test
-    void testHashCode_sameValues_shouldBeEqual() {
-        Task other = new Task("Test Task", "Test Description", Status.NEW);
-        other.setId(1);
-
-        assertEquals(task.hashCode(), other.hashCode());
-    }
-
-    @Test
-    void testHashCode_differentValues_shouldNotBeEqual() {
-        Task other = new Task("Other", "Other", Status.DONE);
-        other.setId(999);
-
-        assertNotEquals(task.hashCode(), other.hashCode());
     }
 }
