@@ -2,15 +2,12 @@ package manager;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import model.Subtask;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
-public class SubtasksHandler extends BaseHttpHandler {
-
+public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
     private final Gson gson = HttpTaskServer.getGson();
 
@@ -19,57 +16,52 @@ public class SubtasksHandler extends BaseHttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange exchange) {
         try {
             String method = exchange.getRequestMethod();
-            String query = exchange.getRequestURI().getQuery();
+            switch (method) {
+                case "GET" -> sendText(exchange, gson.toJson(manager.getAllSubtasks()), 200);
 
-            if ("GET".equalsIgnoreCase(method)) {
-                if (query == null) {
-                    List<Subtask> subtasks = manager.getAllSubtasks();
-                    sendText(exchange, gson.toJson(subtasks), 200);
-                } else if (query.startsWith("id=")) {
-                    int id = Integer.parseInt(query.split("=")[1]);
-                    Subtask subtask = manager.getSubtaskById(id);
-                    if (subtask == null) {
-                        sendNotFound(exchange);
-                        return;
-                    }
-                    sendText(exchange, gson.toJson(subtask), 200);
-                }
-            } else if ("POST".equalsIgnoreCase(method)) {
-                InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8);
-                Subtask subtask = gson.fromJson(isr, Subtask.class);
-                isr.close();
+                case "POST" -> {
+                    String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                    Subtask subtask = gson.fromJson(body, Subtask.class);
 
-                try {
                     if (subtask.getId() == 0) {
+                        if (manager.getEpicById(subtask.getEpicId()) == null) {
+                            sendNotFound(exchange);
+                            return;
+                        }
                         manager.addSubtask(subtask);
+                        sendText(exchange, "{\"id\":" + subtask.getId() + "}", 201);
+
                     } else {
-                        manager.updateSubtask(subtask);
-                    }
-                    sendText(exchange, "{\"status\":\"ok\"}", 201);
-                } catch (TaskOverlapException e) {
-                    sendHasOverlaps(exchange);
-                }
-            } else if ("DELETE".equalsIgnoreCase(method)) {
-                if (query == null) {
-                    manager.clearSubtasks();
-                    sendText(exchange, "{\"status\":\"all subtasks deleted\"}", 200);
-                } else if (query.startsWith("id=")) {
-                    int id = Integer.parseInt(query.split("=")[1]);
-                    try {
-                        manager.removeSubtaskById(id);
-                        sendText(exchange, "{\"status\":\"subtask deleted\"}", 200);
-                    } catch (TaskNotFoundException e) {
-                        sendNotFound(exchange);
+                        Subtask old = manager.getSubtaskById(subtask.getId());
+                        if (old == null) {
+                            sendNotFound(exchange);
+                        } else if (old.getEpicId() != subtask.getEpicId()) {
+                            sendHasOverlaps(exchange);
+                        } else {
+                            manager.updateSubtask(subtask);
+                            sendText(exchange, gson.toJson(subtask), 201);
+                        }
                     }
                 }
-            } else {
-                sendNotFound(exchange);
+
+                case "DELETE" -> {
+                    String query = exchange.getRequestURI().getQuery();
+                    if (query != null && query.startsWith("id=")) {
+                        int id = Integer.parseInt(query.substring(3));
+                        if (manager.getSubtaskById(id) != null) {
+                            manager.removeSubtaskById(id);
+                            sendText(exchange, "{\"status\":\"deleted\"}", 201);
+                        } else sendNotFound(exchange);
+                    } else sendNotFound(exchange);
+                }
+
+                default -> sendNotFound(exchange);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Ошибка SubtasksHandler: " + e.getMessage());
             sendInternalError(exchange);
         }
     }

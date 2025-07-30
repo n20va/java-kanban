@@ -2,13 +2,9 @@ package manager;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
-import model.Task;
+import com.sun.net.httpserver.HttpHandler;
 
-import java.io.IOException;
-import java.util.List;
-
-public class PrioritizedHandler extends BaseHttpHandler {
-
+public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
     private final Gson gson = HttpTaskServer.getGson();
 
@@ -17,17 +13,16 @@ public class PrioritizedHandler extends BaseHttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange exchange) {
         try {
-            if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
-                List<Task> prioritized = manager.getPrioritizedTasks();
-                sendText(exchange, gson.toJson(prioritized), 200);
+            if ("GET".equals(exchange.getRequestMethod())) {
+                sendText(exchange, gson.toJson(manager.getPrioritizedTasks()), 200);
             } else {
                 sendNotFound(exchange);
             }
         } catch (Exception e) {
+            System.err.println("Ошибка PrioritizedHandler: " + e.getMessage());
             sendInternalError(exchange);
         }
     }
 }
-

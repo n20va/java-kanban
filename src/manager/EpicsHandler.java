@@ -2,13 +2,12 @@ package manager;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import model.Epic;
-
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public class EpicsHandler extends BaseHttpHandler {
-
+public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
     private final Gson gson = HttpTaskServer.getGson();
 
@@ -17,42 +16,37 @@ public class EpicsHandler extends BaseHttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange exchange) {
         try {
             String method = exchange.getRequestMethod();
-            String query = exchange.getRequestURI().getQuery();
+            switch (method) {
+                case "GET" -> sendText(exchange, gson.toJson(manager.getAllEpics()), 200);
+                case "POST" -> {
+                    String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                    Epic epic = gson.fromJson(body, Epic.class);
 
-            if ("GET".equalsIgnoreCase(method)) {
-                if (query == null) {
-                    List<Epic> epics = manager.getAllEpics();
-                    sendText(exchange, gson.toJson(epics), 200);
-                } else if (query.startsWith("id=")) {
-                    int id = Integer.parseInt(query.split("=")[1]);
-                    Epic epic = manager.getEpicById(id);
-                    if (epic == null) {
-                        sendNotFound(exchange);
-                        return;
-                    }
-                    sendText(exchange, gson.toJson(epic), 200);
+                    if (epic.getId() == 0) {
+                        manager.addEpic(epic);
+                        sendText(exchange, "{\"id\":" + epic.getId() + "}", 201);
+                    } else if (manager.getEpicById(epic.getId()) != null) {
+                        manager.updateEpic(epic);
+                        sendText(exchange, gson.toJson(epic), 201);
+                    } else sendNotFound(exchange);
                 }
-            } else if ("DELETE".equalsIgnoreCase(method)) {
-                if (query == null) {
-                    manager.clearEpics();
-                    sendText(exchange, "{\"status\":\"all epics deleted\"}", 200);
-                } else if (query.startsWith("id=")) {
-                    int id = Integer.parseInt(query.split("=")[1]);
-                    try {
-                        manager.removeEpicById(id);
-                        sendText(exchange, "{\"status\":\"epic deleted\"}", 200);
-                    } catch (TaskNotFoundException e) {
-                        sendNotFound(exchange);
-                    }
+                case "DELETE" -> {
+                    String query = exchange.getRequestURI().getQuery();
+                    if (query != null && query.startsWith("id=")) {
+                        int id = Integer.parseInt(query.substring(3));
+                        if (manager.getEpicById(id) != null) {
+                            manager.removeEpicById(id);
+                            sendText(exchange, "{\"status\":\"deleted\"}", 201);
+                        } else sendNotFound(exchange);
+                    } else sendNotFound(exchange);
                 }
-            } else {
-                sendNotFound(exchange);
+                default -> sendNotFound(exchange);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Ошибка EpicsHandler: " + e.getMessage());
             sendInternalError(exchange);
         }
     }
