@@ -5,7 +5,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import model.Epic;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
