@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import model.Subtask;
-
 import java.nio.charset.StandardCharsets;
 
 public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
@@ -19,6 +18,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
     public void handle(HttpExchange exchange) {
         try {
             String method = exchange.getRequestMethod();
+
             switch (method) {
                 case "GET" -> sendText(exchange, gson.toJson(manager.getAllSubtasks()), 200);
 
@@ -62,6 +62,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
             }
         } catch (Exception e) {
             System.err.println("Ошибка SubtasksHandler: " + e.getMessage());
+
             sendInternalError(exchange);
         }
     }

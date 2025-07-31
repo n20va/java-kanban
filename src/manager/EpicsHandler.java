@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpHandler;
 import model.Epic;
 import java.nio.charset.StandardCharsets;
 
+
 public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
     private final Gson gson = HttpTaskServer.getGson();
@@ -18,6 +19,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     public void handle(HttpExchange exchange) {
         try {
             String method = exchange.getRequestMethod();
+
             switch (method) {
                 case "GET" -> sendText(exchange, gson.toJson(manager.getAllEpics()), 200);
                 case "POST" -> {
@@ -46,6 +48,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
             }
         } catch (Exception e) {
             System.err.println("Ошибка EpicsHandler: " + e.getMessage());
+
             sendInternalError(exchange);
         }
     }

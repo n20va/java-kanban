@@ -7,6 +7,7 @@ import model.Task;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+
 public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
     private final Gson gson = HttpTaskServer.getGson();
@@ -19,6 +20,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     public void handle(HttpExchange exchange) {
         try {
             String method = exchange.getRequestMethod();
+
             switch (method) {
                 case "GET" -> {
                     List<Task> tasks = manager.getAllTasks();
@@ -52,6 +54,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
             }
         } catch (Exception e) {
             System.err.println("Ошибка TasksHandler: " + e.getMessage());
+
             sendInternalError(exchange);
         }
     }
