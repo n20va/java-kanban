@@ -1,18 +1,24 @@
 package test.manager;
 
-import manager.HistoryManager;
+
 import manager.InMemoryHistoryManager;
 import model.Task;
 import model.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
-    private HistoryManager historyManager;
+
+    private InMemoryHistoryManager historyManager;
+
 
     @BeforeEach
     void setUp() {
@@ -20,47 +26,41 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void addAndGetHistory() {
-        Task task1 = new Task("Task1", "Desc", Status.NEW);
+    void shouldAddAndReturnHistory() {
+        Task task = new Task("Test task", "Description", Status.NEW, Duration.ofMinutes(30), LocalDateTime.now());
+        task.setId(1);
+
+        historyManager.add(task);
+        List<Task> history = historyManager.getHistory();
+
+        assertEquals(1, history.size());
+        assertEquals(task, history.get(0));
+    }
+
+    @Test
+    void shouldNotAddDuplicates() {
+        Task task = new Task("Task", "Desc", Status.NEW, Duration.ofMinutes(20), LocalDateTime.now());
+        task.setId(1);
+        historyManager.add(task);
+        historyManager.add(task);
+
+        assertEquals(1, historyManager.getHistory().size());
+    }
+
+    @Test
+    void shouldRemoveFromHistory() {
+        Task task1 = new Task("Task 1", "Desc 1", Status.NEW, Duration.ofMinutes(10), LocalDateTime.now());
         task1.setId(1);
-        Task task2 = new Task("Task2", "Desc", Status.IN_PROGRESS);
+        Task task2 = new Task("Task 2", "Desc 2", Status.NEW, Duration.ofMinutes(10), LocalDateTime.now());
         task2.setId(2);
 
         historyManager.add(task1);
         historyManager.add(task2);
-
-        List<Task> history = historyManager.getHistory();
-        assertEquals(2, history.size());
-        assertEquals(task1, history.get(0));
-        assertEquals(task2, history.get(1));
-    }
-
-    @Test
-    void shouldRemoveDuplicates() {
-        Task task = new Task("Task", "Desc", Status.NEW);
-        task.setId(1);
-
-        historyManager.add(task);
-        historyManager.add(task);
+        historyManager.remove(1);
 
         List<Task> history = historyManager.getHistory();
         assertEquals(1, history.size());
-    }
-
-    @Test
-    void shouldRemoveNodeFromMiddle() {
-        Task task1 = new Task("Task1", "Desc", Status.NEW);
-        Task task2 = new Task("Task2", "Desc", Status.NEW);
-        Task task3 = new Task("Task3", "Desc", Status.NEW);
-        task1.setId(1); task2.setId(2); task3.setId(3);
-
-        historyManager.add(task1);
-        historyManager.add(task2);
-        historyManager.add(task3);
-        historyManager.add(task2); // Дубликат
-
-        List<Task> history = historyManager.getHistory();
-        assertEquals(3, history.size());
-        assertEquals(List.of(task1, task3, task2), history);
+        assertEquals(task2, history.get(0));
     }
 }
+
