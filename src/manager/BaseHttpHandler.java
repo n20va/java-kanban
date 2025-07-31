@@ -45,5 +45,10 @@ public class BaseHttpHandler {
         }
     }
 
-
+    protected void sendError(HttpExchange exchange, int statusCode, String message) {
+        try {
+            String json = "{\"error\":\"" + message + "\"}";
+            sendText(exchange, json, statusCode);
+        } catch (IOException ignored) {}
+    }
 }
